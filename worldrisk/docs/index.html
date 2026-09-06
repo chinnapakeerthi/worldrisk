@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorldRisk — Threat Intelligence Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0c0e12;
+    --panel: #151920;
+    --panel-2: #1b212a;
+    --line: #262d38;
+    --text: #e7e6de;
+    --text-dim: #8b93a1;
+    --ai-accent: #8b7ff0;
+    --appsec-accent: #3fb0c9;
+    --sev-low: #4fae7a;
+    --sev-med: #d1a940;
+    --sev-high: #d97a45;
+    --sev-crit: #c1453f;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+  }
+
+  /* faint scan-grid texture, functional to the SOC/terminal subject, not decoration */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(120,140,170,0.035) 0px, rgba(120,140,170,0.035) 1px, transparent 1px, transparent 3px);
+    z-index: 1;
+  }
+
+  /* slow scanline sweep */
+  body::after {
+    content: "";
+    position: fixed;
+    left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, rgba(139,127,240,0.05), transparent);
+    animation: sweep 9s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @keyframes sweep {
+    0% { top: -120px; }
+    100% { top: 100vh; }
+  }
+
+  header.masthead {
+    position: relative;
+    z-index: 2;
+    padding: 2.2rem 2rem 1.4rem;
+    max-width: 1240px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .masthead-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.2rem; }
+
+  .brand { display: flex; align-items: center; gap: 0.9rem; }
+
+  .radar { width: 40px; height: 40px; flex-shrink: 0; }
+  .radar-sweep { transform-origin: 50% 50%; animation: spin 3.2s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(1.9rem, 4vw, 2.7rem);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  h1 span { color: var(--appsec-accent); }
+
+  .status-line {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .pulse-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--sev-low);
+    box-shadow: 0 0 0 0 rgba(79,174,122,0.6);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(79,174,122,0.55); }
+    70% { box-shadow: 0 0 0 8px rgba(79,174,122,0); }
+    100% { box-shadow: 0 0 0 0 rgba(79,174,122,0); }
+  }
+
+  .dek {
+    margin: 0.7rem 0 0;
+    color: var(--text-dim);
+    font-size: 0.98rem;
+    max-width: 64ch;
+    line-height: 1.55;
+  }
+
+  .stats-bar {
+    display: flex; gap: 2rem; flex-wrap: wrap;
+    margin-top: 1.3rem;
+    padding-top: 1.1rem;
+    border-top: 1px dashed var(--line);
+  }
+  .stat { display: flex; flex-direction: column; gap: 0.15rem; }
+  .stat .num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+  .stat .label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+
+  .controls {
+    position: relative; z-index: 2;
+    max-width: 1240px;
+    margin: 1.3rem auto 0;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .segmented {
+    display: inline-flex;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .segmented button {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    background: var(--panel);
+    border: none;
+    color: var(--text-dim);
+    padding: 0.45rem 0.9rem;
+    cursor: pointer;
+  }
+  .segmented button + button { border-left: 1px solid var(--line); }
+  .segmented button.active { background: var(--text); color: var(--ink); }
+
+  .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .filter-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .filter-btn:hover { color: var(--text); border-color: var(--text-dim); }
+  .filter-btn.active { color: var(--ink); background: var(--text); border-color: var(--text); }
+
+  .desk {
+    position: relative; z-index: 2;
+    max-width: 1240px;
+    margin: 1.4rem auto 3rem;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.4rem;
+  }
+  @media (max-width: 860px) { .desk { grid-template-columns: 1fr; } }
+
+  .column { background: var(--panel); border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+
+  .column-head {
+    padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 0.6rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot.ai { background: var(--ai-accent); }
+  .dot.appsec { background: var(--appsec-accent); }
+  .column-head h2 { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 600; margin: 0; }
+  .column-head .count { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--text-dim); }
+
+  .entries { max-height: 74vh; overflow-y: auto; }
+
+  .entry {
+    padding: 1.05rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .entry:last-child { border-bottom: none; }
+  .entry:hover { background: var(--panel-2); }
+
+  .entry-meta {
+    display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+  }
+
+  .type-pill { padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.64rem; border: 1px solid var(--line); }
+  .type-pill.vulnerability, .type-pill.attack, .type-pill.breach_loss { border-color: var(--sev-crit); color: var(--sev-crit); }
+  .type-pill.solution { border-color: var(--appsec-accent); color: var(--appsec-accent); }
+  .type-pill.trend { border-color: var(--sev-med); color: var(--sev-med); }
+  .type-pill.owasp_update { border-color: var(--ai-accent); color: var(--ai-accent); }
+
+  .cvss-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.64rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  .entry-title { font-size: 0.98rem; font-weight: 600; line-height: 1.4; margin: 0 0 0.35rem; }
+  .entry-summary { font-size: 0.87rem; line-height: 1.5; color: var(--text-dim); margin: 0 0 0.5rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; color: var(--text-dim); background: var(--ink); border: 1px solid var(--line); padding: 0.08rem 0.42rem; border-radius: 3px; }
+
+  .empty-state { padding: 2rem 1.25rem; color: var(--text-dim); font-size: 0.88rem; text-align: center; }
+
+  footer {
+    position: relative; z-index: 2;
+    max-width: 1240px; margin: 0 auto 3rem; padding: 0 2rem;
+    color: var(--text-dim); font-size: 0.8rem; line-height: 1.6;
+  }
+  footer a { color: var(--text-dim); }
+
+  /* --- detail overlay ("attack page") --- */
+  .overlay {
+    position: fixed; inset: 0; z-index: 10;
+    background: rgba(4,5,7,0.72);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 4vh 1.2rem;
+    overflow-y: auto;
+  }
+  .overlay.open { display: flex; }
+
+  .detail-page {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    max-width: 780px;
+    width: 100%;
+    padding: 2rem 2.2rem 2.4rem;
+    position: relative;
+  }
+
+  .detail-close {
+    position: absolute; top: 1.2rem; right: 1.2rem;
+    background: transparent; border: 1px solid var(--line); color: var(--text-dim);
+    width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 1rem;
+  }
+  .detail-close:hover { color: var(--text); border-color: var(--text-dim); }
+
+  .detail-meta { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text-dim); margin-bottom: 0.9rem; }
+  .detail-title { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 600; line-height: 1.3; margin: 0 0 1.2rem; max-width: 34ch; }
+
+  .detail-section { margin-bottom: 1.2rem; }
+  .detail-section h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: none;
+    color: var(--text-dim);
+    margin: 0 0 0.4rem;
+    letter-spacing: 0.02em;
+  }
+  .detail-section p { margin: 0; font-size: 0.94rem; line-height: 1.6; color: var(--text); }
+
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; }
+  @media (max-width: 560px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  .detail-source-link {
+    display: inline-block;
+    margin-top: 0.6rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--appsec-accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+  .detail-source-link:hover { border-bottom-color: var(--appsec-accent); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-top">
+    <div class="brand">
+      <svg class="radar" viewBox="0 0 40 40">
+        <circle cx="20" cy="20" r="18" fill="none" stroke="#262d38" stroke-width="1"/>
+        <circle cx="20" cy="20" r="12" fill="none" stroke="#262d38" stroke-width="1"/>
+        <circle cx="20" cy="20" r="6" fill="none" stroke="#262d38" stroke-width="1"/>
+        <g class="radar-sweep">
+          <path d="M20 20 L20 2 A18 18 0 0 1 34.7 11.3 Z" fill="#3fb0c9" opacity="0.18"/>
+          <line x1="20" y1="20" x2="20" y2="2" stroke="#3fb0c9" stroke-width="1.4"/>
+        </g>
+        <circle cx="20" cy="20" r="1.6" fill="#e7e6de"/>
+      </svg>
+      <div>
+        <h1>WORLD<span>RISK</span></h1>
+        <div class="status-line"><span class="pulse-dot"></span><span id="updated-line">loading…</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="dek">Two beats, one desk: AI &amp; LLM security research on one side, traditional AppSec vulnerabilities and OWASP updates on the other — sourced from live threat-intel feeds and enriched by Claude with attack detail, CVE/CVSS scoring, consequences, and remediation.</p>
+
+  <div class="stats-bar" id="stats-bar"></div>
+</header>
+
+<div class="controls">
+  <div class="segmented" id="range-toggle">
+    <button class="active" data-range="today">Today</button>
+    <button data-range="30d">Last 30 Days</button>
+  </div>
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-type="all">all</button>
+    <button class="filter-btn" data-type="vulnerability">vulnerability</button>
+    <button class="filter-btn" data-type="attack">attack</button>
+    <button class="filter-btn" data-type="trend">trend</button>
+    <button class="filter-btn" data-type="solution">solution</button>
+    <button class="filter-btn" data-type="breach_loss">breach / loss</button>
+    <button class="filter-btn" data-type="owasp_update">owasp update</button>
+  </div>
+</div>
+
+<main class="desk">
+  <section class="column">
+    <div class="column-head"><span class="dot ai"></span><h2>AI &amp; LLM Security</h2><span class="count" id="ai-count"></span></div>
+    <div class="entries" id="ai-entries"></div>
+  </section>
+  <section class="column">
+    <div class="column-head"><span class="dot appsec"></span><h2>Traditional AppSec</h2><span class="count" id="appsec-count"></span></div>
+    <div class="entries" id="appsec-entries"></div>
+  </section>
+</main>
+
+<footer>
+  Sources: NVD, CISA KEV &amp; advisories, abuse.ch URLhaus, OWASP, The Hacker News, BleepingComputer, Dark Reading,
+  SecurityWeek, Krebs on Security, The Record, Simon Willison's Blog, Embrace The Red, OWASP GenAI Security Project, arXiv (cs.CR).
+  See the project README for the full source list and setup.
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="detail-page" id="detail-page"></div>
+</div>
+
+<script>
+  let activeType = 'all';
+  let activeRange = 'today';
+  let allItems = [];
+
+  function parseDate(iso) {
+    const d = new Date(iso);
+    return isNaN(d) ? null : d;
+  }
+
+  function timeAgo(iso) {
+    const d = parseDate(iso);
+    if (!d) return '';
+    const days = Math.floor((Date.now() - d) / 86400000);
+    if (days <= 0) return 'today';
+    if (days === 1) return '1d ago';
+    return days + 'd ago';
+  }
+
+  function isToday(iso) {
+    const d = parseDate(iso);
+    if (!d) return false;
+    const now = new Date();
+    return d.getUTCFullYear() === now.getUTCFullYear()
+        && d.getUTCMonth() === now.getUTCMonth()
+        && d.getUTCDate() === now.getUTCDate();
+  }
+
+  function cvssColor(score) {
+    if (score === null || score === undefined) return null;
+    if (score >= 9) return 'var(--sev-crit)';
+    if (score >= 7) return 'var(--sev-high)';
+    if (score >= 4) return 'var(--sev-med)';
+    return 'var(--sev-low)';
+  }
+
+  function matchesRange(item) {
+    if (activeRange === 'today') return isToday(item.published);
+    return true; // '30d' — dataset is already retained to the last 30 days
+  }
+
+  function renderStats() {
+    const inRange = allItems.filter(matchesRange);
+    const vulns = inRange.filter(i => i.item_type === 'vulnerability').length;
+    const attacks = inRange.filter(i => i.item_type === 'attack').length;
+    const scored = inRange.filter(i => typeof i.cvss_score === 'number');
+    const avgCvss = scored.length ? (scored.reduce((s, i) => s + i.cvss_score, 0) / scored.length).toFixed(1) : '—';
+
+    document.getElementById('stats-bar').innerHTML = `
+      <div class="stat"><span class="num">${inRange.length}</span><span class="label">ITEMS IN VIEW</span></div>
+      <div class="stat"><span class="num">${vulns}</span><span class="label">VULNERABILITIES</span></div>
+      <div class="stat"><span class="num">${attacks}</span><span class="label">ATTACKS</span></div>
+      <div class="stat"><span class="num">${avgCvss}</span><span class="label">AVG CVSS</span></div>
+    `;
+  }
+
+  function renderColumn(containerId, countId, track) {
+    const container = document.getElementById(containerId);
+    const items = allItems.filter(it =>
+      it.track === track && matchesRange(it) && (activeType === 'all' || it.item_type === activeType)
+    );
+    document.getElementById(countId).textContent = items.length + ' item' + (items.length === 1 ? '' : 's');
+
+    if (items.length === 0) {
+      container.innerHTML = '<div class="empty-state">No items match this filter yet.</div>';
+      return;
+    }
+
+    container.innerHTML = items.map(it => {
+      const cvssColorVal = cvssColor(it.cvss_score);
+      const cvssBadge = cvssColorVal
+        ? `<span class="cvss-badge" style="background:${cvssColorVal}">CVSS ${it.cvss_score}</span>` : '';
+      return `
+        <div class="entry" data-id="${it.id}">
+          <div class="entry-meta">
+            <span class="type-pill ${it.item_type}">${(it.item_type || '').replace('_', ' ')}</span>
+            ${cvssBadge}
+            <span>${it.source}</span>
+            <span>·</span>
+            <span>${timeAgo(it.published)}</span>
+          </div>
+          <p class="entry-title">${it.title}</p>
+          <p class="entry-summary">${it.description ? it.description.slice(0, 160) + (it.description.length > 160 ? '…' : '') : ''}</p>
+          <div class="tags">${(it.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('.entry').forEach(el => {
+      el.addEventListener('click', () => openDetail(el.dataset.id));
+    });
+  }
+
+  function renderAll() {
+    renderStats();
+    renderColumn('ai-entries', 'ai-count', 'ai_security');
+    renderColumn('appsec-entries', 'appsec-count', 'traditional_appsec');
+  }
+
+  function openDetail(id) {
+    const it = allItems.find(x => x.id === id);
+    if (!it) return;
+    const cvssColorVal = cvssColor(it.cvss_score);
+
+    document.getElementById('detail-page').innerHTML = `
+      <button class="detail-close" id="detail-close">✕</button>
+      <div class="detail-meta">
+        <span class="type-pill ${it.item_type}">${(it.item_type || '').replace('_', ' ')}</span>
+        <span>${it.track === 'ai_security' ? 'AI & LLM Security' : 'Traditional AppSec'}</span>
+        <span>·</span>
+        <span>${it.source}</span>
+        <span>·</span>
+        <span>${it.published ? new Date(it.published).toLocaleDateString() : 'undated'}</span>
+      </div>
+      <h2 class="detail-title">${it.title}</h2>
+
+      <div class="detail-grid">
+        <div class="detail-section">
+          <h3>CVE</h3>
+          <p>${it.cve_id || '—'}</p>
+        </div>
+        <div class="detail-section">
+          <h3>CVSS Score</h3>
+          <p>${it.cvss_score != null ? `<span class="cvss-badge" style="background:${cvssColorVal}">${it.cvss_score}</span>` : '—'}</p>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>What happened</h3>
+        <p>${it.description || '—'}</p>
+      </div>
+
+      <div class="detail-section">
+        <h3>Attack source</h3>
+        <p>${it.attack_source || 'N/A'}</p>
+      </div>
+
+      <div class="detail-section">
+        <h3>Consequences</h3>
+        <p>${it.consequences || '—'}</p>
+      </div>
+
+      <div class="detail-section">
+        <h3>Remediation / how it was addressed</h3>
+        <p>${it.remediation || '—'}</p>
+      </div>
+
+      <div class="detail-section">
+        <h3>Reported losses</h3>
+        <p>${it.losses || 'Not reported'}</p>
+      </div>
+
+      <div class="tags">${(it.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+
+      <a class="detail-source-link" href="${it.link}" target="_blank" rel="noopener">View original source →</a>
+    `;
+
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('detail-close').addEventListener('click', closeDetail);
+  }
+
+  function closeDetail() {
+    document.getElementById('overlay').classList.remove('open');
+  }
+
+  document.getElementById('overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'overlay') closeDetail();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetail(); });
+
+  document.getElementById('filters').addEventListener('click', (e) => {
+    if (!e.target.matches('.filter-btn')) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    activeType = e.target.dataset.type;
+    renderAll();
+  });
+
+  document.getElementById('range-toggle').addEventListener('click', (e) => {
+    if (!e.target.matches('button')) return;
+    document.querySelectorAll('#range-toggle button').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    activeRange = e.target.dataset.range;
+    renderAll();
+  });
+
+  fetch('./data.json')
+    .then(r => r.json())
+    .then(payload => {
+      allItems = payload.items || [];
+      const updated = new Date(payload.generated_at);
+      document.getElementById('updated-line').textContent =
+        'LIVE · updated ' + (isNaN(updated) ? payload.generated_at : updated.toLocaleString())
+        + ' · ' + (payload.retention_days || 30) + '-day retention';
+      renderAll();
+    })
+    .catch(err => {
+      document.getElementById('updated-line').textContent = 'failed to load data.json';
+      console.error(err);
+    });
+</script>
+
+</body>
+</html>
