@@ -35,16 +35,39 @@ RSS_FEEDS = [
     {"url": "https://www.securityweek.com/feed/", "source": "SecurityWeek", "track": "traditional_appsec"},
     {"url": "https://krebsonsecurity.com/feed/", "source": "Krebs on Security", "track": "traditional_appsec"},
     {"url": "https://therecord.media/feed", "source": "The Record", "track": "traditional_appsec"},
-    {"url": "https://owasp.org/news/index.xml", "source": "OWASP News", "track": "traditional_appsec"},
-    {"url": "https://www.cisa.gov/cybersecurity-advisories/all.xml", "source": "CISA Advisories", "track": "traditional_appsec"},
-    {"url": "https://www.us-cert.gov/ics/advisories/advisories.xml", "source": "CISA ICS Advisories", "track": "traditional_appsec"},
+
+    # FIXED URLS
+    {"url": "https://owasp.org/feed.xml", "source": "OWASP News", "track": "traditional_appsec"},
+    {"url": "https://www.cisa.gov/cybersecurity-advisories/cybersecurity-advisories.xml", "source": "CISA Advisories", "track": "traditional_appsec"},
+    {"url": "https://www.cisa.gov/cybersecurity-advisories/ics-advisories.xml", "source": "CISA ICS Advisories", "track": "traditional_appsec"},
+
+    # NEW SOURCES — Traditional AppSec
+    {"url": "https://isc.sans.edu/rssfeed.xml", "source": "SANS Internet Storm Center", "track": "traditional_appsec"},
+    {"url": "https://feeds.feedburner.com/TheHackersNews", "source": "THN Feedburner", "track": "traditional_appsec"},
+    {"url": "https://www.schneier.com/feed/atom/", "source": "Schneier on Security", "track": "traditional_appsec"},
+    {"url": "https://googleprojectzero.blogspot.com/feeds/posts/default", "source": "Google Project Zero", "track": "traditional_appsec"},
+    {"url": "https://www.mandiant.com/resources/blog/rss.xml", "source": "Mandiant Blog", "track": "traditional_appsec"},
+    {"url": "https://unit42.paloaltonetworks.com/feed/", "source": "Palo Alto Unit 42", "track": "traditional_appsec"},
+    {"url": "https://blog.talosintelligence.com/feeds/posts/default", "source": "Cisco Talos", "track": "traditional_appsec"},
+    {"url": "https://www.crowdstrike.com/blog/feed/", "source": "CrowdStrike Blog", "track": "traditional_appsec"},
+    {"url": "https://research.checkpoint.com/feed/", "source": "Check Point Research", "track": "traditional_appsec"},
+    {"url": "https://www.rapid7.com/blog/feed/", "source": "Rapid7 Blog", "track": "traditional_appsec"},
+    {"url": "https://socprime.com/feed/", "source": "SOC Prime", "track": "traditional_appsec"},
 
     # --- AI / LLM security ---
     {"url": "https://simonwillison.net/atom/everything/", "source": "Simon Willison's Blog", "track": "ai_security"},
     {"url": "https://embracethered.com/blog/index.xml", "source": "Embrace The Red", "track": "ai_security"},
-    {"url": "https://genai.owasp.org/feed/", "source": "OWASP GenAI Security Project", "track": "ai_security"},
-    {"url": "https://www.lakera.ai/blog/rss.xml", "source": "Lakera Blog", "track": "ai_security"},
-    {"url": "https://hiddenlayer.com/rss/", "source": "HiddenLayer Research", "track": "ai_security"},
+    {"url": "https://genai.owasp.org/feed.xml", "source": "OWASP GenAI Security Project", "track": "ai_security"},
+
+    # FIXED URLS
+    {"url": "https://www.lakera.ai/blog/rss", "source": "Lakera Blog", "track": "ai_security"},
+    {"url": "https://hiddenlayer.com/research/feed/", "source": "HiddenLayer Research", "track": "ai_security"},
+
+    # NEW SOURCES — AI / LLM Security
+    {"url": "https://www.anthropic.com/research/feed.xml", "source": "Anthropic Research", "track": "ai_security"},
+    {"url": "https://openai.com/research/index/rss.xml", "source": "OpenAI Research", "track": "ai_security"},
+    {"url": "https://aivillage.org/feed.xml", "source": "AI Village", "track": "ai_security"},
+    {"url": "https://www.alignmentforum.org/feed.xml", "source": "AI Alignment Forum", "track": "ai_security"},
 ]
 
 # --- JSON/REST sources ----------------------------------------------------
