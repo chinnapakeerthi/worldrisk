@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-09-02T12:00:00+00:00",
   "retention_days": 30,
-  "count": 14,
+  "count": 13,
   "items": [
     {
       "id": "demo0001",
@@ -18,7 +18,11 @@
       "consequences": "Applications built with agent frameworks that don't validate tool-call intent may act outside the user's actual request, from unintended purchases to unauthorized data access.",
       "remediation": "OWASP recommends explicit allow-lists for tool scopes, human confirmation for high-impact actions, and logging tool-call chains for post-hoc review.",
       "losses": null,
-      "tags": ["OWASP", "LLM Top 10", "agentic AI"]
+      "tags": [
+        "OWASP",
+        "LLM Top 10",
+        "agentic AI"
+      ]
     },
     {
       "id": "demo0002",
@@ -35,7 +39,11 @@
       "consequences": "In the disclosed proof of concept, the assistant exfiltrated the user's upcoming meeting details to an attacker-controlled URL embedded in the invite.",
       "remediation": "Vendor patched by treating all retrieved third-party content as untrusted input and stripping URL-like instructions before passing content to the model.",
       "losses": null,
-      "tags": ["prompt injection", "RAG", "data exfiltration"]
+      "tags": [
+        "prompt injection",
+        "RAG",
+        "data exfiltration"
+      ]
     },
     {
       "id": "demo0003",
@@ -52,7 +60,10 @@
       "consequences": "Not applicable -- this is a defensive research contribution rather than an incident.",
       "remediation": "The paper's method itself is the remediation: activation-space anomaly detection as an additional jailbreak-detection layer alongside prompt and output filtering.",
       "losses": null,
-      "tags": ["jailbreak detection", "interpretability"]
+      "tags": [
+        "jailbreak detection",
+        "interpretability"
+      ]
     },
     {
       "id": "demo0004",
@@ -69,7 +80,11 @@
       "consequences": "Successful exploitation grants full control of the VPN appliance, potentially exposing the internal network behind it.",
       "remediation": "Vendor released a patch; CISA's required action is to patch by the binding operational directive deadline or disconnect the appliance from the internet.",
       "losses": null,
-      "tags": ["CVE", "deserialization", "VPN"]
+      "tags": [
+        "CVE",
+        "deserialization",
+        "VPN"
+      ]
     },
     {
       "id": "demo0005",
@@ -86,7 +101,11 @@
       "consequences": "Names, dates of birth, and diagnosis codes for 2.1 million patients were exposed to anyone who could guess or iterate the record identifier.",
       "remediation": "The company added object-level authorization checks on the claims endpoint and rotated all record identifiers to non-sequential UUIDs.",
       "losses": "Estimated $38M in remediation, notification, and regulatory costs (company disclosure)",
-      "tags": ["IDOR", "healthcare", "breach"]
+      "tags": [
+        "IDOR",
+        "healthcare",
+        "breach"
+      ]
     },
     {
       "id": "demo0006",
@@ -103,7 +122,11 @@
       "consequences": "Organizations relying on the prior, thinner guidance may have under-scoped their supply-chain controls.",
       "remediation": "Adopt SBOM generation in CI, verify build provenance (e.g. SLSA), and pin dependency versions with hash verification.",
       "losses": null,
-      "tags": ["OWASP Top 10", "supply chain", "SBOM"]
+      "tags": [
+        "OWASP Top 10",
+        "supply chain",
+        "SBOM"
+      ]
     },
     {
       "id": "demo0007",
@@ -120,7 +143,11 @@
       "consequences": "Victims skip the usual weeks-long dwell time typical of phishing-based intrusions, leaving less time for detection before data is exfiltrated and encrypted.",
       "remediation": "Rotate CI/CD secrets regularly, use short-lived tokens, scan repos and build logs for accidental credential exposure, and enforce least-privilege scopes on pipeline service accounts.",
       "losses": "Multiple victim organizations reported six-figure ransom demands (aggregate trend reporting)",
-      "tags": ["ransomware", "CI/CD", "secrets management"]
+      "tags": [
+        "ransomware",
+        "CI/CD",
+        "secrets management"
+      ]
     },
     {
       "id": "demo0008",
@@ -137,7 +164,10 @@
       "consequences": "Traditional 'don't share sensitive data with the chatbot' training for employees no longer covers the actual risk surface once agents have autonomous access to connected systems.",
       "remediation": "Scope agent permissions narrowly, redact secrets at the data-source level rather than relying on prompt discipline, and audit what an agent's connected tools can actually read.",
       "losses": null,
-      "tags": ["data leakage", "AI agents"]
+      "tags": [
+        "data leakage",
+        "AI agents"
+      ]
     },
     {
       "id": "demo0009",
@@ -154,7 +184,11 @@
       "consequences": "Frameworks that don't validate tool descriptions against expected behavior are vulnerable to being redirected into unintended actions by any tool in their toolchain.",
       "remediation": "The authors recommend sandboxing tool descriptions, verifying tool provenance, and adding an intent-consistency check before executing high-impact tool calls.",
       "losses": null,
-      "tags": ["confused deputy", "agent security", "benchmark"]
+      "tags": [
+        "confused deputy",
+        "agent security",
+        "benchmark"
+      ]
     },
     {
       "id": "demo0010",
@@ -171,7 +205,11 @@
       "consequences": "Not applicable -- this is a testing tool release.",
       "remediation": "N/A -- the tool itself is used to find and remediate algorithm-confusion flaws before attackers do.",
       "losses": null,
-      "tags": ["JWT", "Burp Suite", "tooling"]
+      "tags": [
+        "JWT",
+        "Burp Suite",
+        "tooling"
+      ]
     },
     {
       "id": "demo0011",
@@ -188,24 +226,11 @@
       "consequences": "Card data for an estimated 400,000 transactions across 60 store locations was exposed over a six-week period before detection.",
       "remediation": "The chain deployed point-to-point encryption on all terminals and segmented the POS network from the corporate network.",
       "losses": "Estimated $12M in fraud liability, forensics, and card-reissuance costs",
-      "tags": ["POS malware", "retail", "card data"]
-    },
-    {
-      "id": "demo0012",
-      "source": "abuse.ch URLhaus",
-      "title": "Malware distribution URL flagged: fake browser-update payload",
-      "link": "https://urlhaus.abuse.ch/",
-      "published": "2026-08-05T00:00:00Z",
-      "track": "traditional_appsec",
-      "item_type": "attack",
-      "description": "A malware-distribution URL disguised as a browser update prompt was flagged by the URLhaus community feed. Visitors to the compromised site were shown a fake update dialog that, when clicked, downloaded an infostealer payload.",
-      "attack_source": "Unattributed infostealer distribution campaign",
-      "cve_id": null,
-      "cvss_score": null,
-      "consequences": "Systems that executed the fake update had browser-stored credentials and session cookies harvested.",
-      "remediation": "The distribution URL was added to threat-intel blocklists; affected users are advised to reset credentials and revoke active sessions.",
-      "losses": null,
-      "tags": ["infostealer", "malvertising"]
+      "tags": [
+        "POS malware",
+        "retail",
+        "card data"
+      ]
     },
     {
       "id": "demo0013",
@@ -222,7 +247,11 @@
       "consequences": "Any service placed behind the affected gateway version without additional authentication is reachable by unauthenticated requests.",
       "remediation": "Upgrade to the patched gateway version; as a stopgap, reject requests with malformed Authorization headers at the load balancer.",
       "losses": null,
-      "tags": ["CVE", "authentication bypass", "API gateway"]
+      "tags": [
+        "CVE",
+        "authentication bypass",
+        "API gateway"
+      ]
     },
     {
       "id": "demo0014",
@@ -239,7 +268,11 @@
       "consequences": "Direct financial loss of $6M, with only a portion recoverable through the bank's fraud-reversal process.",
       "remediation": "The firm implemented out-of-band verification for any change to payment instructions and added DMARC enforcement to reduce email spoofing.",
       "losses": "$6M direct financial loss, partially recovered",
-      "tags": ["BEC", "wire fraud", "email security"]
+      "tags": [
+        "BEC",
+        "wire fraud",
+        "email security"
+      ]
     }
   ]
 }
