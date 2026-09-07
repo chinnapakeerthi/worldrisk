@@ -19,6 +19,7 @@ from __future__ import annotations
 import hashlib
 import json
 
+import re
 import feedparser
 import requests
 
@@ -115,7 +116,7 @@ def fetch_rss_sources() -> list[dict]:
                 "title": entry.get("title", "").strip(),
                 "link": link,
                 "published": published,
-                "raw_summary": (entry.get("summary", "") or "")[:3000],
+                "raw_summary": re.sub(r'<[^>]+>', '', (entry.get("summary", "") or ""))[:3000],
                 "default_track": feed_cfg["track"],
             })
     return items
@@ -247,7 +248,6 @@ def fetch_all(nvd_start_iso: str | None = None, nvd_end_iso: str | None = None) 
     items.extend(fetch_rss_sources())
     items.extend(fetch_cisa_kev())
     items.extend(fetch_arxiv_ai_security())
-    items.extend(fetch_urlhaus_recent())
     if nvd_start_iso and nvd_end_iso:
         items.extend(fetch_nvd_recent(nvd_start_iso, nvd_end_iso))
 
