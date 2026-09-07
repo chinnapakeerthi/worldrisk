@@ -335,8 +335,8 @@
 
 <div class="controls">
   <div class="segmented" id="range-toggle">
-    <button class="active" data-range="today">Today</button>
-    <button data-range="30d">Last 30 Days</button>
+    <button data-range="today">Today</button>
+    <button class="active" data-range="30d">Last 30 Days</button>
   </div>
   <div class="filters" id="filters">
     <button class="filter-btn active" data-type="all">all</button>
@@ -372,7 +372,7 @@
 
 <script>
   let activeType = 'all';
-  let activeRange = 'today';
+  let activeRange = '30d';
   let allItems = [];
 
   function parseDate(iso) {
