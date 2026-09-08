@@ -113,7 +113,7 @@ def fetch_rss_sources() -> list[dict]:
             items.append({
                 "id": _hash_id(link),
                 "source": feed_cfg["source"],
-                "title": entry.get("title", "").strip(),
+                "title": re.sub(r'<[^>]+>', '', entry.get("title", "")).strip(),
                 "link": link,
                 "published": published,
                 "raw_summary": re.sub(r'<[^>]+>', '', (entry.get("summary", "") or ""))[:3000],
