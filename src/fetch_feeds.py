@@ -55,6 +55,10 @@ RSS_FEEDS = [
     {"url": "https://www.rapid7.com/blog/feed/", "source": "Rapid7 Blog", "track": "traditional_appsec"},
     {"url": "https://socprime.com/feed/", "source": "SOC Prime", "track": "traditional_appsec"},
     {"url": "https://dailycybersecurity.com/feed/", "source": "Daily CyberSecurity", "track": "traditional_appsec"},
+    {"url": "https://www.malwarebytes.com/blog/feed/", "source": "Malwarebytes Labs", "track": "traditional_appsec"},
+    {"url": "https://blog.malwarebytes.com/feed/", "source": "Malwarebytes Blog", "track": "traditional_appsec"},
+    {"url": "https://www.welivesecurity.com/feed/", "source": "ESET WeLiveSecurity", "track": "traditional_appsec"},
+    {"url": "https://securelist.com/feed/", "source": "Kaspersky Securelist", "track": "traditional_appsec"},
 
     # --- AI / LLM security ---
     {"url": "https://simonwillison.net/atom/everything/", "source": "Simon Willison's Blog", "track": "ai_security"},
